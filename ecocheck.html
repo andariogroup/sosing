@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ECOCHECK | Diagnóstico Ambiental Express - SOSING S.A.S.</title>
+<meta name="description" content="Descubre en minutos qué obligaciones ambientales tiene tu negocio ante la autoridad ambiental correspondiente. Diagnóstico, kits y trámites ambientales por SOSING S.A.S.">
+<link rel="canonical" href="https://sosinggroup.com/ecocheck.html">
+</head>
+<body style="margin:0;background:#F7F5F0;">
+<div id="ecocheck-root" style="font-family: 'IBM Plex Sans', system-ui, sans-serif; background:#F7F5F0; color:#1C2B22; max-width:480px; margin:0 auto; padding:20px 20px 70px; border-radius:16px;">
+  <div id="ec-app"></div>
+</div>
+
+<script>
+(function(){
+  const CARS = {
+    "Amazonas":"CORPOAMAZONIA","Antioquia":"CORANTIOQUIA / CORNARE / CORPOURABÁ","Arauca":"CORPORINOQUIA",
+    "Atlántico":"CRA","Bogotá D.C.":"Secretaría Distrital de Ambiente","Bolívar":"CARDIQUE / CSB",
+    "Boyacá":"CORPOBOYACÁ / CORPOCHIVOR","Caldas":"CORPOCALDAS","Caquetá":"CORPOAMAZONIA","Casanare":"CORPORINOQUIA",
+    "Cauca":"CRC","Cesar":"CORPOCESAR","Córdoba":"CVS","Cundinamarca":"CAR Cundinamarca / CORPOGUAVIO",
+    "Chocó":"CODECHOCÓ","Guainía":"CDA","Guaviare":"CDA","Huila":"CAM","La Guajira":"CORPOGUAJIRA",
+    "Magdalena":"CORPAMAG","Meta":"CORMACARENA","Nariño":"CORPONARIÑO","Norte de Santander":"CORPONOR",
+    "Putumayo":"CORPOAMAZONIA","Quindío":"CRQ","Risaralda":"CARDER","San Andrés y Providencia":"CORALINA",
+    "Santander":"CAS / CDMB","Sucre":"CARSUCRE","Tolima":"CORTOLIMA","Valle del Cauca":"CVC / DAGMA",
+    "Vaupés":"CDA","Vichada":"CORPORINOQUIA"
+  };
+  const BUSINESS_TYPES = ["Restaurante","Taller automotriz","Hotel","Comercio","Industria","Estación de servicio","Finca / agro","Constructora","Consultorio / salud","Otro negocio"];
+  const QUESTIONS = [
+    {id:"q1",text:"¿Generas residuos peligrosos (aceites, químicos, pilas, luminarias)?",tag:"RESPEL"},
+    {id:"q2",text:"¿Usas o generas Aceite de Cocina Usado (ACU)?",tag:"ACU"},
+    {id:"q3",text:"¿Viertes aguas residuales a alcantarillado, río o suelo?",tag:"Vertimientos"},
+    {id:"q4",text:"¿Captas agua de pozo, aljibe o fuente natural?",tag:"Concesión de aguas"},
+    {id:"q5",text:"¿Generas más de 1 m³ de residuos sólidos ordinarios al día?",tag:"PGIRS"},
+    {id:"q6",text:"¿Tu negocio realiza obra civil, remodelación o movimiento de tierra?",tag:"RCD"},
+    {id:"q7",text:"¿Usas o almacenas sustancias químicas o combustibles?",tag:"RUA"},
+    {id:"q8",text:"¿Has recibido alguna vez una visita o requerimiento de la autoridad ambiental?",tag:"Antecedentes"},
+    {id:"q9",text:"¿Cuentas con algún documento ambiental vigente (PMA, concepto, permiso)?",tag:"Documentación",inverse:true},
+    {id:"q10",text:"¿Sabes con certeza qué trámites ambientales aplican a tu negocio?",tag:"Conocimiento",inverse:true}
+  ];
+  const CATALOG = [
+    {id:"test",name:"Test de cumplimiento ambiental",desc:"Evaluación rápida de 5 preguntas.",price:19900,cat:"Diagnósticos"},
+    {id:"diagnostico",name:"Diagnóstico Ambiental Express",desc:"Informe con obligaciones, riesgos y checklist.",price:49900,cat:"Diagnósticos"},
+    {id:"diagnostico-vertimientos",name:"Diagnóstico de vertimientos",desc:"Evaluación de tus vertimientos y su manejo.",price:149900,cat:"Diagnósticos"},
+    {id:"diagnostico-establecimiento",name:"Diagnóstico ambiental de establecimiento",desc:"Evaluación integral en sitio.",price:199900,cat:"Diagnósticos"},
+    {id:"checklist-rest",name:"Checklist ambiental para restaurantes",desc:"Lista de verificación sectorial.",price:29900,cat:"Kits sectoriales"},
+    {id:"kit-respel",name:"Kit RESPEL para pequeña empresa",desc:"Formatos y guía de manejo de residuos peligrosos.",price:79900,cat:"Kits sectoriales"},
+    {id:"kit-pgirs",name:"Kit PGIRS empresarial",desc:"Plan de gestión integral de residuos sólidos.",price:69900,cat:"Kits sectoriales"},
+    {id:"kit-acu",name:"Kit manejo de ACU",desc:"Guía y formatos para aceite de cocina usado.",price:39900,cat:"Kits sectoriales"},
+    {id:"kit-restaurantes",name:"Kit ambiental para restaurantes",desc:"Checklist + formatos + buenas prácticas.",price:79900,cat:"Kits sectoriales"},
+    {id:"kit-contratistas",name:"Kit ambiental para contratistas",desc:"Checklist de obra + manejo de RCD + bitácora.",price:149900,cat:"Kits sectoriales"},
+    {id:"revision-rua",name:"Revisión de RUA",desc:"Revisión técnica de tu Registro Único Ambiental.",price:99900,cat:"Trámites"},
+    {id:"prep-rua",name:"Preparación de información para RUA",desc:"Armamos tu información lista para radicar.",price:149900,cat:"Trámites"},
+    {id:"revision-requerimiento",name:"Revisión de requerimiento ambiental",desc:"Análisis de oficios, actas o autos de la autoridad.",price:99900,cat:"Trámites"},
+    {id:"concepto-express",name:"Concepto ambiental express",desc:"Concepto técnico preliminar sobre tu situación.",price:149900,cat:"Trámites"},
+    {id:"revision-pma",name:"Revisión de PMA",desc:"Revisión de tu Plan de Manejo Ambiental.",price:199900,cat:"Trámites"},
+    {id:"matriz-legal",name:"Matriz de requisitos legales ambientales",desc:"Normograma aplicable a tu actividad.",price:99900,cat:"Trámites"},
+    {id:"revisa-documento",name:"Revisa este documento",desc:"Sube un oficio, acta o resolución y te decimos qué hacer.",price:49900,cat:"Trámites"}
+  ];
+  const PLANS = [
+    {id:"basico",name:"Plan Básico",tagline:"Conoce tus obligaciones ambientales.",price:49900,period:"pago único"},
+    {id:"pro",name:"Plan Pro",tagline:"Diagnóstico + documentos básicos + plan de acción.",price:149900,period:"pago único"},
+    {id:"empresa",name:"Plan Empresa",tagline:"Diagnóstico + matriz legal + documentos + asesoría.",price:299900,period:"pago único"},
+    {id:"anual",name:"SOSING Ambiental 24/7",tagline:"Vigilancia continua de tu cumplimiento.",price:39900,period:"/mes"}
+  ];
+  const PAY = ["Tarjeta / PSE (Wompi)","Nequi","Transferencia Bancolombia"];
+  const fmt = n => "$" + n.toLocaleString("es-CO");
+
+  let state = { step:"hero", depto:"", answers:{}, qIndex:0, cart:[], pay:0 };
+
+  function semaforo(level){
+    const colors = {rojo:"#B23A2E",amarillo:"#C98A2B",verde:"#2F6B4F"};
+    return `<div style="display:flex;flex-direction:column;gap:10px;background:#1C2B22;padding:14px;border-radius:16px;width:56px;">
+      ${["rojo","amarillo","verde"].map(c=>`<div style="width:28px;height:28px;border-radius:50%;margin:0 auto;background:${colors[c]};opacity:${level===c?1:0.18};"></div>`).join("")}
+    </div>`;
+  }
+
+  function computeResult(){
+    let s=0; const riesgos=[];
+    QUESTIONS.forEach(q=>{
+      const val = state.answers[q.id];
+      const pos = q.inverse ? val==="no" : val==="si";
+      if(pos){ s++; riesgos.push(q.tag); }
+    });
+    let level = "verde";
+    if(s>=6) level="rojo"; else if(s>=3) level="amarillo";
+    return {level, riesgos};
+  }
+
+  function addToCart(id, kind){
+    const ex = state.cart.find(i=>i.id===id && i.kind===kind);
+    if(ex) ex.qty++; else state.cart.push({id,kind,qty:1});
+    render();
+  }
+  function removeFromCart(id, kind){
+    state.cart = state.cart.filter(i=>!(i.id===id && i.kind===kind));
+    render();
+  }
+  function cartItems(){
+    return state.cart.map(i=>{
+      const src = i.kind==="plan" ? PLANS : CATALOG;
+      const item = src.find(p=>p.id===i.id);
+      return Object.assign({}, item, {qty:i.qty, kind:i.kind});
+    });
+  }
+  function cartTotal(){ return cartItems().reduce((s,i)=>s+i.price*i.qty,0); }
+  function cartCount(){ return state.cart.reduce((n,i)=>n+i.qty,0); }
+
+  function nav(){
+    if(state.step==="hero") return "";
+    return `<div style="display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;">
+      ${[["tienda","Tienda"],["planes","Planes"],["hero","Diagnóstico"]].map(([id,label])=>
+        `<button onclick="EC.go('${id}')" style="padding:6px 14px;border-radius:20px;border:1px solid #1C2B22;font-size:12.5px;cursor:pointer;background:${state.step===id?'#1C2B22':'#fff'};color:${state.step===id?'#fff':'#1C2B22'};">${label}</button>`
+      ).join("")}
+    </div>`;
+  }
+
+  function header(){
+    return `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+      <div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="EC.go('hero')">
+        <div style="width:10px;height:10px;border-radius:50%;background:#2F6B4F;"></div>
+        <span style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#5B6B60;">SOSING · ECOCHECK</span>
+      </div>
+      <button onclick="EC.go('carrito')" style="position:relative;background:none;border:none;cursor:pointer;font-size:20px;">🛒
+        ${cartCount()>0?`<span style="position:absolute;top:-6px;right:-8px;background:#B23A2E;color:#fff;font-size:10px;border-radius:10px;padding:1px 5px;">${cartCount()}</span>`:""}
+      </button>
+    </div>`;
+  }
+
+  function btnPrimary(label, onclick){
+    return `<button onclick="${onclick}" style="width:100%;padding:15px 20px;background:#2F6B4F;color:#fff;border:none;border-radius:12px;font-size:15.5px;font-weight:600;cursor:pointer;">${label}</button>`;
+  }
+  function btnSecondary(label, onclick){
+    return `<button onclick="${onclick}" style="width:100%;padding:13px 20px;background:transparent;color:#1C2B22;border:1.5px solid #1C2B22;border-radius:12px;font-size:14.5px;font-weight:600;cursor:pointer;margin-top:10px;">${label}</button>`;
+  }
+
+  function screenHero(){
+    return `<div style="display:flex;gap:18px;align-items:center;margin-bottom:22px;">
+        ${semaforo("rojo")}
+        <h1 style="font-family:Georgia,serif;font-size:30px;line-height:1.1;margin:0;font-weight:600;">¿Tu negocio está en regla con el medio ambiente?</h1>
+      </div>
+      <p style="font-size:15px;line-height:1.55;color:#3C4A40;margin-bottom:22px;">Responde 10 preguntas y descubre qué obligaciones ambientales tiene tu negocio, ante qué autoridad, y qué tan expuesto estás a una sanción.</p>
+      ${btnPrimary("Empezar diagnóstico gratis →","EC.go('tipo')")}
+      ${btnSecondary("Ver todos los servicios","EC.go('tienda')")}
+      ${btnSecondary("Ver planes y suscripción","EC.go('planes')")}`;
+  }
+
+  function screenTipo(){
+    return `<div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8A9188;">Paso 1 de 3</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;margin-top:10px;">¿Qué tipo de negocio tienes?</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;">
+        ${BUSINESS_TYPES.map(b=>`<button onclick="EC.go('depto')" style="padding:14px 12px;border-radius:12px;border:1.5px solid #E4DCC8;background:#fff;font-size:14px;cursor:pointer;text-align:left;">${b}</button>`).join("")}
+      </div>`;
+  }
+
+  function screenDepto(){
+    const options = Object.keys(CARS).sort().map(d=>`<option value="${d}" ${state.depto===d?"selected":""}>${d}</option>`).join("");
+    return `<div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8A9188;">Paso 2 de 3</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;margin-top:10px;">¿En qué departamento operas?</h2>
+      <select onchange="EC.setDepto(this.value)" style="width:100%;padding:14px 12px;margin-top:18px;border-radius:10px;border:1.5px solid #E4DCC8;font-size:15px;background:#fff;">
+        <option value="">Selecciona tu departamento</option>${options}
+      </select>
+      ${state.depto?`<p style="font-size:13px;color:#5B6B60;margin-top:10px;">Autoridad ambiental identificada: <strong style="color:#1C2B22;">${CARS[state.depto]}</strong></p>`:""}
+      <div style="margin-top:20px;opacity:${state.depto?1:0.4};pointer-events:${state.depto?"auto":"none"};">${btnPrimary("Continuar →","EC.go('quiz')")}</div>`;
+  }
+
+  function screenQuiz(){
+    const q = QUESTIONS[state.qIndex];
+    return `<div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8A9188;">Paso 3 de 3 · Pregunta ${state.qIndex+1} de ${QUESTIONS.length}</div>
+      <div style="height:4px;background:#E4DCC8;border-radius:4px;margin:10px 0 24px;"><div style="height:4px;width:${(state.qIndex/QUESTIONS.length)*100}%;background:#2F6B4F;border-radius:4px;"></div></div>
+      <div style="font-size:11px;letter-spacing:1.5px;color:#C98A2B;text-transform:uppercase;margin-bottom:8px;">${q.tag}</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;margin-top:0;">${q.text}</h2>
+      <div style="display:flex;gap:12px;margin-top:22px;">
+        <button onclick="EC.answer('si')" style="flex:1;padding:16px 0;border-radius:12px;border:1.5px solid #E4DCC8;background:#fff;font-size:14px;cursor:pointer;text-align:center;">Sí</button>
+        <button onclick="EC.answer('no')" style="flex:1;padding:16px 0;border-radius:12px;border:1.5px solid #E4DCC8;background:#fff;font-size:14px;cursor:pointer;text-align:center;">No</button>
+      </div>`;
+  }
+
+  function screenResultado(){
+    const {level, riesgos} = computeResult();
+    const car = CARS[state.depto] || "—";
+    const labelLevel = level==="verde"?"Riesgo bajo":level==="amarillo"?"Riesgo medio — hay que verificar":"Riesgo alto";
+    return `<div style="display:flex;gap:18px;align-items:center;margin-bottom:20px;">
+        ${semaforo(level)}
+        <div><div style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#5B6B60;">Tu perfil ambiental</div>
+        <div style="font-family:Georgia,serif;font-size:22px;font-weight:600;">${labelLevel}</div></div>
+      </div>
+      <div style="background:#fff;border:1.5px solid #E4DCC8;border-radius:14px;padding:18px;margin-bottom:16px;">
+        <div style="font-size:13px;color:#5B6B60;margin-bottom:10px;">Autoridad ambiental competente</div>
+        <div style="font-weight:600;margin-bottom:16px;">${car}</div>
+        <div style="font-size:13px;color:#5B6B60;margin-bottom:10px;">Obligaciones identificadas (${riesgos.length})</div>
+        ${riesgos.length===0?`<div style="font-size:14px;">No se identificaron riesgos evidentes.</div>`:riesgos.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px;"><span style="width:6px;height:6px;border-radius:50%;background:#B23A2E;display:inline-block;"></span>${r}</div>`).join("")}
+      </div>
+      <div style="background:#1C2B22;color:#F7F5F0;border-radius:14px;padding:20px;margin-bottom:12px;">
+        <div style="font-family:Georgia,serif;font-size:19px;margin-bottom:6px;">Diagnóstico Ambiental Express</div>
+        <p style="font-size:13.5px;line-height:1.5;color:#D9D2C0;margin-bottom:14px;">Informe completo en PDF con plazos, riesgo de sanción y checklist de documentos.</p>
+        <div style="font-size:26px;font-weight:700;margin-bottom:14px;">${fmt(49900)}</div>
+        <button onclick="EC.addToCart('diagnostico','producto');EC.go('carrito')" style="width:100%;padding:15px 20px;background:#F7F5F0;color:#1C2B22;border:none;border-radius:12px;font-size:15.5px;font-weight:600;cursor:pointer;">Agregar y pagar</button>
+      </div>
+      ${btnSecondary("Ver otros servicios relacionados","EC.go('tienda')")}
+      <p style="font-size:11.5px;color:#8A9188;line-height:1.5;margin:20px 0;">Este diagnóstico es una guía orientativa y no constituye un concepto técnico oficial ni una certificación ante la autoridad ambiental. En casos de riesgo alto, un profesional de SOSING revisa el caso antes de la entrega final.</p>
+      <button onclick="EC.restart()" style="width:100%;padding:14px 12px;border-radius:12px;border:1.5px solid #E4DCC8;background:#fff;font-size:14px;cursor:pointer;">Hacer otro diagnóstico</button>`;
+  }
+
+  function screenTienda(){
+    const grouped = {};
+    CATALOG.forEach(p=>{ (grouped[p.cat]=grouped[p.cat]||[]).push(p); });
+    return `<div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8A9188;">Catálogo completo</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;margin-top:10px;">Tienda de servicios ambientales</h2>
+      <p style="font-size:14px;color:#5B6B60;margin:8px 0 20px;">Compra por unidad lo que necesites hoy.</p>
+      ${Object.entries(grouped).map(([cat,items])=>`
+        <div style="margin-bottom:22px;">
+          <div style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#C98A2B;margin-bottom:10px;">${cat}</div>
+          ${items.map(p=>`
+            <div style="background:#fff;border:1.5px solid #E4DCC8;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;">
+              <div><div style="font-weight:600;font-size:14.5px;">${p.name}</div>
+              <div style="font-size:12.5px;color:#5B6B60;margin-top:2px;">${p.desc}</div>
+              <div style="font-weight:700;margin-top:6px;">${fmt(p.price)}</div></div>
+              <button onclick="EC.addToCart('${p.id}','producto')" style="padding:8px 12px;border-radius:12px;border:1.5px solid #E4DCC8;background:#fff;font-size:14px;cursor:pointer;white-space:nowrap;">Agregar</button>
+            </div>`).join("")}
+        </div>`).join("")}`;
+  }
+
+  function screenPlanes(){
+    return `<div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8A9188;">Suscripción</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;margin-top:10px;">Planes SOSING</h2>
+      <p style="font-size:14px;color:#5B6B60;margin:8px 0 20px;">De la claridad puntual a la vigilancia continua de tu cumplimiento.</p>
+      ${PLANS.map(pl=>`
+        <div style="background:${pl.id==="anual"?"#1C2B22":"#fff"};color:${pl.id==="anual"?"#F7F5F0":"#1C2B22"};border:1.5px solid #E4DCC8;border-radius:14px;padding:18px;margin-bottom:12px;">
+          <div style="font-family:Georgia,serif;font-size:19px;margin-bottom:4px;">${pl.name}</div>
+          <div style="font-size:13.5px;color:${pl.id==="anual"?"#D9D2C0":"#5B6B60"};margin-bottom:12px;">${pl.tagline}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:22px;font-weight:700;">${fmt(pl.price)}<span style="font-size:12px;font-weight:400;"> ${pl.period}</span></div>
+            <button onclick="EC.addToCart('${pl.id}','plan')" style="padding:8px 14px;border-radius:12px;border:1.5px solid #E4DCC8;background:${pl.id==="anual"?"#F7F5F0":"#fff"};font-size:14px;cursor:pointer;">Elegir</button>
+          </div>
+        </div>`).join("")}`;
+  }
+
+  function screenCarrito(){
+    const items = cartItems();
+    if(items.length===0) return `<div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8A9188;">Tu pedido</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;margin-top:10px;">Carrito</h2>
+      <p style="font-size:14px;color:#5B6B60;margin-top:14px;">Aún no has agregado nada.</p>`;
+    return `<div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8A9188;">Tu pedido</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;margin-top:10px;">Carrito</h2>
+      ${items.map(i=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #E4DCC8;">
+          <div><div style="font-weight:600;font-size:14px;">${i.name} ${i.qty>1?`×${i.qty}`:""}</div>
+          <div style="font-size:12.5px;color:#5B6B60;">${fmt(i.price)} ${i.kind==="plan"?i.period:""}</div></div>
+          <button onclick="EC.removeFromCart('${i.id}','${i.kind}')" style="background:none;border:none;color:#B23A2E;font-size:13px;cursor:pointer;">Quitar</button>
+        </div>`).join("")}
+      <div style="display:flex;justify-content:space-between;padding:16px 0;font-weight:700;font-size:17px;"><span>Total</span><span>${fmt(cartTotal())}</span></div>
+      ${btnPrimary("Ir a pagar →","EC.go('checkout')")}`;
+  }
+
+  function screenCheckout(){
+    return `<div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8A9188;">Pago</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;margin-top:10px;">Método de pago</h2>
+      <div style="margin-top:16px;margin-bottom:20px;">
+        ${PAY.map((m,idx)=>`<button onclick="EC.setPay(${idx})" style="width:100%;margin-bottom:8px;padding:14px 12px;border-radius:12px;border:1.5px solid ${state.pay===idx?"#2F6B4F":"#E4DCC8"};background:#fff;font-size:14px;cursor:pointer;text-align:left;display:flex;justify-content:space-between;">${m} ${state.pay===idx?"✓":""}</button>`).join("")}
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:14px 0;font-weight:700;font-size:17px;border-top:1px solid #E4DCC8;margin-bottom:16px;"><span>Total a pagar</span><span>${fmt(cartTotal())}</span></div>
+      ${btnPrimary("Pagar " + fmt(cartTotal()), "EC.go('confirmacion')")}
+      <p style="font-size:11.5px;color:#8A9188;line-height:1.5;margin-top:14px;">Este botón se conecta a Wompi mediante un webhook de Zapier configurado por SOSING.</p>`;
+  }
+
+  function screenConfirmacion(){
+    return `<div style="text-align:center;padding-top:30px;">
+      <div style="font-size:40px;margin-bottom:14px;">✅</div>
+      <h2 style="font-family:Georgia,serif;font-size:22px;">Pedido registrado</h2>
+      <p style="font-size:14px;color:#5B6B60;margin:10px 0 22px;line-height:1.5;">En breve recibirás tu informe por WhatsApp y correo.</p>
+      <button onclick="EC.restart()" style="width:100%;padding:15px 20px;background:#2F6B4F;color:#fff;border:none;border-radius:12px;font-size:15.5px;font-weight:600;cursor:pointer;">Volver al inicio</button>
+    </div>`;
+  }
+
+  function render(){
+    const screens = {hero:screenHero, tipo:screenTipo, depto:screenDepto, quiz:screenQuiz, resultado:screenResultado, tienda:screenTienda, planes:screenPlanes, carrito:screenCarrito, checkout:screenCheckout, confirmacion:screenConfirmacion};
+    document.getElementById("ec-app").innerHTML = header() + nav() + screens[state.step]();
+  }
+
+  window.EC = {
+    go(step){ state.step = step; render(); },
+    setDepto(v){ state.depto = v; render(); },
+    answer(val){
+      const q = QUESTIONS[state.qIndex];
+      state.answers[q.id] = val;
+      if(state.qIndex < QUESTIONS.length - 1){ state.qIndex++; } else { state.step = "resultado"; }
+      render();
+    },
+    addToCart(id, kind){ addToCart(id, kind); },
+    removeFromCart(id, kind){ removeFromCart(id, kind); },
+    setPay(i){ state.pay = i; render(); },
+    restart(){ state = { step:"hero", depto:"", answers:{}, qIndex:0, cart: state.cart, pay:0 }; render(); }
+  };
+
+  render();
+})();
+</script>
+</body>
+</html>
