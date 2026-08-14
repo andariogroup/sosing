@@ -65,6 +65,8 @@
   ];
   const PAY = ["Tarjeta / PSE (Wompi)","Nequi","Transferencia Bancolombia"];
   const fmt = n => "$" + n.toLocaleString("es-CO");
+  const PAYMENT_LINKS = { "diagnostico": "https://checkout.wompi.co/l/65IJJb" };
+
 
   let state = { step:"hero", depto:"", answers:{}, qIndex:0, cart:[], pay:0 };
 
@@ -195,7 +197,7 @@
         <div style="font-family:Georgia,serif;font-size:19px;margin-bottom:6px;">Diagnóstico Ambiental Express</div>
         <p style="font-size:13.5px;line-height:1.5;color:#D9D2C0;margin-bottom:14px;">Informe completo en PDF con plazos, riesgo de sanción y checklist de documentos.</p>
         <div style="font-size:26px;font-weight:700;margin-bottom:14px;">${fmt(49900)}</div>
-        <button onclick="EC.addToCart('diagnostico','producto');EC.go('carrito')" style="width:100%;padding:15px 20px;background:#F7F5F0;color:#1C2B22;border:none;border-radius:12px;font-size:15.5px;font-weight:600;cursor:pointer;">Agregar y pagar</button>
+        <button onclick="EC.buy('diagnostico','producto')" style="width:100%;padding:15px 20px;background:#F7F5F0;color:#1C2B22;border:none;border-radius:12px;font-size:15.5px;font-weight:600;cursor:pointer;">Pagar con Wompi ahora</button>
       </div>
       ${btnSecondary("Ver otros servicios relacionados","EC.go('tienda')")}
       <p style="font-size:11.5px;color:#8A9188;line-height:1.5;margin:20px 0;">Este diagnóstico es una guía orientativa y no constituye un concepto técnico oficial ni una certificación ante la autoridad ambiental. En casos de riesgo alto, un profesional de SOSING revisa el caso antes de la entrega final.</p>
@@ -216,7 +218,7 @@
               <div><div style="font-weight:600;font-size:14.5px;">${p.name}</div>
               <div style="font-size:12.5px;color:#5B6B60;margin-top:2px;">${p.desc}</div>
               <div style="font-weight:700;margin-top:6px;">${fmt(p.price)}</div></div>
-              <button onclick="EC.addToCart('${p.id}','producto')" style="padding:8px 12px;border-radius:12px;border:1.5px solid #E4DCC8;background:#fff;font-size:14px;cursor:pointer;white-space:nowrap;">Agregar</button>
+              <button onclick="EC.buy('${p.id}','producto')" style="padding:8px 12px;border-radius:12px;border:1.5px solid #E4DCC8;background:#fff;font-size:14px;cursor:pointer;white-space:nowrap;">Agregar</button>
             </div>`).join("")}
         </div>`).join("")}`;
   }
@@ -288,6 +290,7 @@
       render();
     },
     addToCart(id, kind){ addToCart(id, kind); },
+    buy(id, kind){ if(PAYMENT_LINKS[id]){ window.open(PAYMENT_LINKS[id], '_blank'); } else { addToCart(id, kind); } },
     removeFromCart(id, kind){ removeFromCart(id, kind); },
     setPay(i){ state.pay = i; render(); },
     restart(){ state = { step:"hero", depto:"", answers:{}, qIndex:0, cart: state.cart, pay:0 }; render(); }
